@@ -1,8 +1,5 @@
 function getCenterElementInArray(array) {
-  for (let i = 0; i < array.length; i++) {
-    if (i + 9 > array.length) {
-      return;
-    }
+  for (let i = 0; i <= array.length - 9; i++) {
     const formedWord = array.slice(i, i + 9);
     console.log("formedWord", formedWord);
     const hasXXX =
