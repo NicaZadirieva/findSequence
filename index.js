@@ -1,4 +1,5 @@
 const { createWorkerProcess } = require("./worker");
+const getCenterElementInArray = require("./util");
 
 const { performance, PerformanceObserver } = require("perf_hooks");
 const os = require("os");
@@ -29,8 +30,15 @@ function parallelExecution(arr) {
   });
 }
 
+function linearExecution(arr) {
+  performance.mark("linear start");
+  getCenterElementInArray(arr);
+  performance.mark("linear end");
+  performance.measure("linear", "linear start", "linear end");
+}
 function main() {
   const array = [0, 0, 0, 1, 1, 1, 2, 2, 2, 1, 1, 1];
+  linearExecution(array);
   parallelExecution(array);
 }
 
