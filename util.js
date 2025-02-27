@@ -13,6 +13,4 @@ function getCenterElementInArray(array) {
   }
 }
 
-const array = [0, 0, 0, 1, 1, 1, 2, 2, 2, 1, 1, 1];
-
-getCenterElementInArray(array);
+module.exports = getCenterElementInArray;
