@@ -1,4 +1,4 @@
-const { createWorkerProcess } = require("./worker");
+const WorkerManager = require("./WorkerManager");
 const getCenterElementInArray = require("./util");
 
 const { performance, PerformanceObserver } = require("perf_hooks");
@@ -16,18 +16,33 @@ const performanceObserver = new PerformanceObserver((items) => {
 });
 performanceObserver.observe({ entryTypes: ["measure"] });
 
-function parallelExecution(arr) {
+async function parallelExecution(arr) {
   const chunkSize = Math.ceil(arr.length / COUNT_CORE);
-  const results = [];
+
+  const data = [];
   for (let i = 0; i < COUNT_CORE; i++) {
     const start = i * chunkSize;
-    results.push(createWorkerProcess(arr.slice(start, start + 9 * chunkSize)));
+    data.push([arr.slice(start, start + 9 * chunkSize)]);
   }
+
   performance.mark("parallel start");
-  return Promise.all(results).then((res) => {
-    performance.mark("parallel end");
-    performance.measure("parallel", "parallel start", "parallel end");
-  });
+  const workerManager = new WorkerManager(chunkSize, data);
+  let count_workers = 0;
+  const res = [];
+  while (count_workers < data.length) {
+    const task = workerManager.launchTask();
+    if (task) {
+      count_workers++;
+      res.push(
+        await task.then((r) => {
+          return r;
+        })
+      );
+      console.log("res", res);
+    }
+  }
+  performance.mark("parallel end");
+  performance.measure("parallel", "parallel start", "parallel end");
 }
 
 function linearExecution(arr) {
